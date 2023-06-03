@@ -1,15 +1,17 @@
 #!/bin/bash
 # =========================================
 vlx=$(grep -c -E "^#& " "/etc/xray/config.json")
-
+let vla=$vlx/2
 vmc=$(grep -c -E "^### " "/etc/xray/config.json")
-
+let vma=$vmc/2
 ssh1="$(awk -F: '$3 >= 1000 && $1 != "nobody" {print $1}' /etc/passwd | wc -l)"
 
 trx=$(grep -c -E "^#! " "/etc/xray/config.json")
-
+let tra=$trx/2
 ssx=$(grep -c -E "^## " "/etc/xray/config.json")
-#######PERIZINAN
+let ssa=$ssx/2
+COLOR1='\033[0;35m'
+COLOR2='\033[0;39m'
 clear
 # // Exporting Language to UTF-8
 export LC_ALL='en_US.UTF-8'
@@ -47,16 +49,21 @@ export Server_IP="underfined"
 export Script_Mode="Stable"
 export Auther="XdrgVPN"
 
-# // Exporting IP Address
-export IP=$( curl -s https://ipinfo.io/ip/ )
-
-# // SSH Websocket Proxy
-ssh_ws=$( systemctl status ws-epro | grep Active | awk '{print $3}' | sed 's/(//g' | sed 's/)//g' )
-if [[ $ssh_ws == "running" ]]; then
-    status_ws="${GREEN}ON${NC}"
-else
-    status_ws="${RED}OFF${NC}"
+# // Root Checking
+if [ "${EUID}" -ne 0 ]; then
+                echo -e "${EROR} Please Run This Script As Root User !"
+                exit 1
 fi
+tomem="$(free | awk '{print $2}' | head -2 | tail -n 1 )"
+usmem="$(free | awk '{print $3}' | head -2 | tail -n 1 )"
+cpu1="$(mpstat | awk '{print $4}' | head -4 |tail -n 1)"
+cpu2="$(mpstat | awk '{print $6}' | head -4 |tail -n 1)"
+
+persenmemori="$(echo "scale=2; $usmem*100/$tomem" | bc)"
+#persencpu=
+persencpu="$(echo "scale=2; $cpu1+$cpu2" | bc)"
+# // Exporting IP Address
+export MYIP=$( curl -s https://ipinfo.io/ip/ )
 
 # // nginx
 nginx=$( systemctl status nginx | grep Active | awk '{print $3}' | sed 's/(//g' | sed 's/)//g' )
@@ -73,94 +80,66 @@ if [[ $xray == "running" ]]; then
 else
     status_xray="${RED}OFF${NC}"
 fi
+ttoday="$(vnstat | grep today | awk '{print $8" "substr ($9, 1, 3)}' | head -1)"
+tmon="$(vnstat -m | grep `date +%G-%m` | awk '{print $8" "substr ($9, 1 ,3)}' | head -1)"
 
 clear
-clear
-function add-host(){
-clear
-echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m${NC}"
-echo -e " ${COLBG1}               • ADD VPS HOST •                ${NC}"
-echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m${NC}"
-echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m${NC}"
-read -rp "  New Host Name : " -e host
-echo ""
-if [ -z $host ]; then
-echo -e "  [INFO] Type Your Domain/sub domain"
-echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m${NC}"
-echo ""
-read -n 1 -s -r -p "  Press any key to back on menu"
-menu
-else
-echo "IP=$host" > /var/lib/ssnvpn-pro/ipvps.conf
-echo ""
-echo "  [INFO] Dont forget to renew cert"
-echo ""
-echo -e "$COLOR1━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m${NC}"
-echo ""
-read -n 1 -s -r -p "  Press any key to Renew Cret"
-crtxray
-fi
-}
-clear
-clear
-echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m${NC}"
-echo -e "\E[44;1;39m                     ⇱ INFORMASI VPS ⇲                        \E[0m"
-echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m${NC}"
-
-echo -e "□ Server Uptime       = $( uptime -p  | cut -d " " -f 2-10000 ) "
-echo -e "□ Current Time        = $( date -d "0 days" +"%d-%m-%Y | %X" )"
-echo -e "□ Operating System    = $( cat /etc/os-release | grep -w PRETTY_NAME | sed 's/PRETTY_NAME//g' | sed 's/=//g' | sed 's/"//g' ) ( $( uname -m) )"
-echo -e "□ Current Domain      = $( cat /etc/xray/domain )"
-echo -e "□ Server IP           = ${IP}"
-echo -e "□ Clients Name        = FREE"
-echo -e "□ Expired Script VPS  = LIFETIME"
-echo -e "□ Time Reboot VPS     = 00:00 ${GREEN}( Jam 12 Malam )${NC}"
-
-echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m${NC}"
-echo -e "\E[44;1;39m                     ⇱ STATUS LAYANAN ⇲                       \E[0m"
-echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m${NC}"
-echo -e ""
-echo -e " [ ${GREEN}SSH WebSocket${NC} : ${GREEN}ON ${NC}]     [ ${GREEN}XRAY${NC} : ${status_xray} ]      [ ${GREEN}NGINX${NC} : ${status_nginx} ]"
 echo -e "$COLOR1┌────────────────────────────────────────────────────────────┐${NC}"
-echo -e "$COLOR1│\033[0m ${BOLD}${YELLOW}SSH  VMESS   VLESS  TROJAN   SHADOWSOCKS$NC"
-echo -e "$COLOR1│\033[0m ${Blue} $ssh1     $vmc       $vlx      $trx           $ssx   $NC"
+echo -e "                     << INFORMASI VPS >>                    \E[0m"
 echo -e "$COLOR1└────────────────────────────────────────────────────────────┘${NC}"
-echo -e ""
-echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m${NC}"
-echo -e "\E[44;1;39m                     ⇱ Rere  Store ⇲                          \E[0m"
-echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m${NC}"
-echo -e ""
-echo -e "${COLOR1}[01]${NC} • [ ${YELLOW}PANEL SSH${NC} ]      ${COLOR1}[08]${NC} • [ ${YELLOW}MENU BACKUP${NC} ]"
-echo -e "${COLOR1}[02]${NC} • [ ${YELLOW}PANEL VMESS${NC} ]    ${COLOR1}[09]${NC} • [ ${YELLOW}SETING${NC} ]"
-echo -e "${COLOR1}[03]${NC} • [ ${YELLOW}PANEL VLESS${NC} ]    ${COLOR1}[10]${NC} • [ ${YELLOW}VPS INFORMATION${NC} ]"
-echo -e "${COLOR1}[04]${NC} • [ ${YELLOW}PANEL TROJAN${NC} ]   ${COLOR1}[11]${NC} • [ ${YELLOW}ADD DOMAIN${NC} ]"
-echo -e "${COLOR1}[05]${NC} • [ ${YELLOW}PANEL SHADOW${NC} ]   ${COLOR1}[12]${NC} • [ ${YELLOW}GEN CERT${NC} ]"
-echo -e "${COLOR1}[06]${NC} • [ ${YELLOW}SET DNS${NC} ]        ${COLOR1}[13]${NC} • [ ${YELLOW}LOAD VPS${NC} ]"
-echo -e "${COLOR1}[07]${NC} • [ ${YELLOW}TEMA${NC} ]           ${COLOR1}[14]${NC} • [ ${YELLOW}CHANGE PW VPS${NC} ]"
-echo -e " ${RED}"
-echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m${NC}"
-echo -e "\E[44;1;39m                     ⇱ Rere  Store ⇲                          \E[0m"
-echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m${NC}"
 
+echo -e "• Current Time        = $( date -d "0 days" +"%d-%m-%Y | %X" )"
+echo -e "• Current Domain      = $( cat /etc/xray/domain )"
+echo -e "• Server IP           = $MYIP"
+echo -e "• ISP                 = $(cat /root/.isp)${NC}"
+echo -e "• Server Resource     = RAM = $persenmemori% | CPU = $persencpu%"
+echo -e "• Clients Name        = FREE"
+echo -e "• Expired Script VPS  = LIFETIME"
+echo -e "• Status Hari ini     = jangan lupa untuk selalu tersenyum"
 echo -e ""
-
+echo -e "$COLOR1┌────────────────────────────────────────────────────────────┐${NC}"
+echo -e " ${COLOR2}[ SSH WebSocket${NC}: ${GREEN}ON ${NC}]  [ NGINX${NC}: ${status_nginx} ] ${COLOR2}[ Today  : $ttoday ]"
+echo -e " [ XRAY${NC}         : ${status_xray} ]                ${COLOR2}[ Monthly: $tmon ]"
+echo -e "$COLOR1┌────────────────────────────────────────────────────────────┐${NC}"
+echo -e "$COLOR1│  \033[0m ${BOLD}${YELLOW}SSH     VMESS       VLESS      TROJAN       SHADOWSOCKS$NC  $COLOR1│"
+echo -e "$COLOR1│  \033[0m ${Blue} $ssh1        $vma           $vla          $tra               $ssa          $NC $COLOR1│"
+echo -e "$COLOR1└────────────────────────────────────────────────────────────┘${NC}"
+echo -e "      $COLOR1┌────────────────────── BY ───────────────────────┐${NC}"
+echo -e "      $COLOR1│${NC}                •  Rerechan Store  •             $COLOR1│$NC"
+echo -e "      $COLOR1└─────────────────────────────────────────────────┘${NC}" 
+echo -e ""
+echo -e " ${CYAN}[01]${NC} • [SSH MENU${NC}]${CYAN}[08]${NC} • [INSTALL ADS-BLOCK${NC}]${CYAN}[15]${NC} • [RUNNING${NC}]"
+echo -e " ${CYAN}[02]${NC} • [VMESS${NC}]   ${CYAN}[09]${NC} • [ADS-BLOCK MENU${NC}]   ${CYAN}[16]${NC} • [SPEEDTEST${NC}]"
+echo -e " ${CYAN}[03]${NC} • [VLESS${NC}]   ${CYAN}[10]${NC} • [CEK-TRAFIK${NC}]       ${CYAN}[17]${NC} • [INFO${NC}]"
+echo -e " ${CYAN}[04]${NC} • [TROJAN${NC}]  ${CYAN}[11]${NC} • [CEK BANDWIDTH${NC}]    ${CYAN}[18]${NC} • [CLEARLOG${NC}]"
+echo -e " ${CYAN}[05]${NC} • [SSWS ${NC}]   ${CYAN}[12]${NC} • [UPDATE-SCRIPT${NC}]    ${CYAN}[19]${NC} • [REBOOT${NC}]"
+echo -e " ${CYAN}[06]${NC} • [ADD-HOST${NC}]${CYAN}[13]${NC} • [RESTART SERVICE${NC}]     "
+echo -e " ${CYAN}[07]${NC} • [GEN-CERT${NC}]${CYAN}[14]${NC} • [AUTO-POINTING${NC}] "
+echo -e "$COLOR1└────────────────────────────────────────────────────────────┘${NC}"
+echo -e " [X]${NC} • [PRESS X TO EXIT]"
+echo -e ""
 echo -ne " Select menu : "; read opt
 case $opt in
-01 | 1) clear ; menu-ssh ;;
-02 | 2) clear ; menu-vmess ;;
-03 | 3) clear ; menu-vless ;;
-04 | 4) clear ; menu-trojan ;;
-05 | 5) clear ; menu-ss ;;
-06 | 6) clear ; menu-dns ;;
-06 | 7) clear ; menu-theme ;;
-07 | 8) clear ; menu-backup ;;
-09 | 9) clear ; menu-set ;;
-10) clear ; info ;;
-11) clear ; add-host ;;
-12) clear ; crtxray ;;
-13) clear ; gotop ;;
-14) clear ; passwd ;;
-100) clear ; $up2u ;;
-00 | 0) clear ; menu ;;
+1) clear ; menu-ssh ;;
+2) clear ; menuv ;;
+3) clear ; menul ;;
+4) clear ; menut ;;
+5) clear ; menus ;;
+6) clear ; add-host ;;
+7) clear ; genssl ;;
+8) clear ; rm -rf /usr/local/sbin/helium && wget -q -O /usr/local/sbin/helium https://raw.githubusercontent.com/abidarwish/helium/main/helium.sh && chmod +x /usr/local/sbin/helium && helium ;;
+9) clear ; helium ;;
+10) clear ; cek-trafik ;;
+11) clear ; cek-bandwidth ;;
+12) clear ; updatsc ;;
+13) clear ; restartsc ;;
+14) clear ; domaingratis ;;
+15) clear ; running ;;
+16) clear ; cek-speed ;;
+17) clear ; cat /root/log-install.txt ;;
+18) clear ; clearlog ;;
+19) clear ; reboot ;;
+0) clear ; menu ;;
+x) exit ;;
 *) clear ; menu ;;
 esac
