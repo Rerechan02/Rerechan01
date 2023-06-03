@@ -1,0 +1,51 @@
+cd /usr/bin
+# menu
+wget -O menu "https://raw.githubusercontent.com/Rerechan02/Rerechan01/main/menu/menu.sh"
+wget -O menuv "https://raw.githubusercontent.com/Rerechan02/Rerechan01/main/menu/menuv.sh"
+wget -O menul "https://raw.githubusercontent.com/Rerechan02/Rerechan01/main/menu/menul.sh"
+wget -O running "https://raw.githubusercontent.com/Rerechan02/Rerechan01/main/menu/running.sh"
+wget -O menut "https://raw.githubusercontent.com/Rerechan02/Rerechan01/main/menu/menut.sh"
+wget -O menuss "https://raw.githubusercontent.com/Rerechan02/Rerechan01/main/menu/menuss.sh"
+# menu ssh ovpn
+wget -O menu-ssh "https://raw.githubusercontent.com/Rerechan02/Rerechan01/main/ssh/menush.sh"
+
+#menu system"https://raw.githubusercontent.com/Rerechan02/Rerechan01/main/menu/menut.sh"
+wget -O add-host "https://raw.githubusercontent.com/Rerechan02/Rerechan01/main/ssh/add-host.sh"
+wget -O genssl "https://raw.githubusercontent.com/Rerechan02/Rerechan01/main/port/genssl.sh"
+wget -O cek-speed "https://raw.githubusercontent.com/Rerechan02/Rerechan01/main/ssh/speedtest_cli.py"
+wget -O restart "https://raw.githubusercontent.com/Rerechan02/Rerechan01/main/menu/restart.sh"
+wget -O cek-trafik "https://raw.githubusercontent.com/Rerechan02/Rerechan01/main/menu/cek-trafik.sh
+wget -O cek-bandwidth "https://raw.githubusercontent.com/Rerechan02/Rerechan01/main/menu/cek-bandwidth.sh"
+wget -O domaingratis "https://raw.githubusercontent.com/Rerechan02/Example/main/cf.sh"
+
+wget -O xp "https://raw.githubusercontent.com/Rerechan02/Rerechan01/main/ssh/xp.sh"
+
+#SHADOWSOCKS
+wget -O add-ssws "https://raw.githubusercontent.com/Rerechan02/Rerechan01/main/ssws/add-ssws.sh"
+wget -O del-ssws "https://raw.githubusercontent.com/Rerechan02/Rerechan01/main/ssws/del--ssws.sh"
+wget -O cek-ssws "https://raw.githubusercontent.com/Rerechan02/Rerechan01/main/ssws/cek--ssws.sh"
+wget -O renew-ssws "https://raw.githubusercontent.com/Rerechan02/Rerechan01/main/ssws/renew--ssws.sh"
+
+#TROJAN
+wget -O add-tr "https://raw.githubusercontent.com/Rerechan02/Rerechan01/main/trojan/add-tr.sh"
+wget -O cek-tr "https://raw.githubusercontent.com/Rerechan02/Rerechan01/main/trojan/cek-tr.sh"
+wget -O del-tr "https://raw.githubusercontent.com/Rerechan02/Rerechan01/main/trojan/del-tr.sh"
+wget -O renew-tr "https://raw.githubusercontent.com/Rerechan02/Rerechan01/main/trojan/renew-tr.sh"
+
+#VLESS
+wget -O renew-vless "https://raw.githubusercontent.com/Rerechan02/Rerechan01/main/vless/renew-vless.sh"
+wget -O renew-vless "https://raw.githubusercontent.com/Rerechan02/Rerechan01/main/vless/renew-vless.sh"
+wget -O renew-vless "https://raw.githubusercontent.com/Rerechan02/Rerechan01/main/vless/renew-vless.sh"
+wget -O renew-vless "https://raw.githubusercontent.com/Rerechan02/Rerechan01/main/vless/renew-vless.sh"
+
+#VMESS
+wget -O renew-vmess "https://raw.githubusercontent.com/Rerechan02/Rerechan01/main/vmess/renew-vmess.sh"
+wget -O renew-vless "https://raw.githubusercontent.com/Rerechan02/Rerechan01/main/vmess/renew-vmess.sh"
+wget -O renew-vless "https://raw.githubusercontent.com/Rerechan02/Rerechan01/main/vmess/renew-vmess.sh"
+wget -O renew-vless "https://raw.githubusercontent.com/Rerechan02/Rerechan01/main/vmess/renew-vmess.sh"
+
+
+
+
+chmod +x *
+cd
